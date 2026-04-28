@@ -15,22 +15,23 @@ services:
       - ollama
     restart: unless-stopped
     environment:
-      # Token de seguridad (puedes cambiarlo aquí directamente)
       - OPENCLAW_GATEWAY_TOKEN=9d82b3a1f4e5c6d7a8b90123e4f5a6b7c8d9e0f1
       - OPENCLAW_DEFAULT_PROVIDER=ollama
       - OPENCLAW_DEFAULT_MODEL=gemma4:26b
       - OPENCLAW_OLLAMA_URL=http://ollama:11434
-      # Parche de seguridad para tu dominio .com.mx
+      # PARCHE MAESTRO: Permitir todos los orígenes para saltar el bloqueo del proxy
       - OPENCLAW_GATEWAY_CONTROLUI_ALLOWALLORIGINS=true
+      - OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS=*
       - OPENCLAW_GATEWAY_PUBLIC_URL=https://openclaw.fnconsultorias.com.mx
     volumes:
-      - oclaw_config_final:/home/node/.openclaw
+      # CAMBIAMOS EL VOLUMEN A V5: Esto obliga a crear una config limpia sin errores
+      - oclaw_config_v5:/home/node/.openclaw
     networks:
       - dokploy-network
 
 volumes:
   oclaw_ollama_data:
-  oclaw_config_final:
+  oclaw_config_v5:
 
 networks:
   dokploy-network:
