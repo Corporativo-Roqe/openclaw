@@ -1,7 +1,6 @@
 services:
   ollama:
     image: ollama/ollama:latest
-    container_name: oclaw-ai-engine
     restart: unless-stopped
     volumes:
       - oclaw_ollama_data:/root/.ollama
@@ -10,7 +9,6 @@ services:
 
   openclaw:
     image: ghcr.io/openclaw/openclaw:latest
-    container_name: oclaw-gateway
     depends_on:
       - ollama
     restart: unless-stopped
@@ -19,22 +17,17 @@ services:
       - OPENCLAW_DEFAULT_PROVIDER=ollama
       - OPENCLAW_DEFAULT_MODEL=gemma4:26b
       - OPENCLAW_OLLAMA_URL=http://ollama:11434
-      
-      # VARIABLES CRÍTICAS PARA TRAEFIK / DOKPLOY
       - OPENCLAW_GATEWAY_TRUST_PROXY=true
       - OPENCLAW_GATEWAY_PUBLIC_URL=https://openclaw.fnconsultorias.com.mx
-      - OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS=https://openclaw.fnconsultorias.com.mx,wss://openclaw.fnconsultorias.com.mx
       - OPENCLAW_GATEWAY_CONTROLUI_ALLOWALLORIGINS=true
-      
     volumes:
-      # Usamos el volumen V7 para asegurar que no haya rastro de errores previos
-      - oclaw_config_v7:/home/node/.openclaw
+      - oclaw_config_v10:/home/node/.openclaw
     networks:
       - dokploy-network
 
 volumes:
   oclaw_ollama_data:
-  oclaw_config_v7:
+  oclaw_config_v10:
 
 networks:
   dokploy-network:
