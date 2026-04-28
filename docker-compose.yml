@@ -19,15 +19,20 @@ services:
       - OPENCLAW_OLLAMA_URL=http://ollama:11434
       - OPENCLAW_GATEWAY_TRUST_PROXY=true
       - OPENCLAW_GATEWAY_PUBLIC_URL=https://openclaw.fnconsultorias.com.mx
-      - OPENCLAW_GATEWAY_CONTROLUI_ALLOWALLORIGINS=true
+      
+      # LA SOLUCIÓN DEFINITIVA:
+      - OPENCLAW_GATEWAY_CONTROLUI_DANGEROUSLYALLOWHOSTHEADERORIGINFALLBACK=true
+      - OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS=https://openclaw.fnconsultorias.com.mx
+      
     volumes:
-      - oclaw_config_v10:/home/node/.openclaw
+      # CAMBIAMOS AL VOLUMEN V12: Para forzar que OpenClaw cree una config limpia con estas reglas
+      - oclaw_config_v12:/home/node/.openclaw
     networks:
       - dokploy-network
 
 volumes:
   oclaw_ollama_data:
-  oclaw_config_v10:
+  oclaw_config_v12:
 
 networks:
   dokploy-network:
