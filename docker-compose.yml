@@ -19,23 +19,28 @@ services:
       - OPENCLAW_DEFAULT_PROVIDER=ollama
       - OPENCLAW_DEFAULT_MODEL=gemma4:26b
       - OPENCLAW_OLLAMA_URL=http://ollama:11434
+      
+      # PARCHES DE SEGURIDAD PARA PROXY Y SSL
       - OPENCLAW_GATEWAY_TRUST_PROXY=true
       - OPENCLAW_GATEWAY_PUBLIC_URL=https://openclaw.fnconsultorias.com.mx
       
-      # LA SOLUCIÓN NUCLEAR: Aceptar todo (*)
-      - OPENCLAW_GATEWAY_CONTROL_UI_ALLOWED_ORIGINS=*
-      - OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS=*
+      # FORMATOS DE ORIGEN (DUPLICADOS PARA COMPATIBILIDAD)
+      - OPENCLAW_GATEWAY_CONTROL_UI_ALLOWED_ORIGINS=https://openclaw.fnconsultorias.com.mx,wss://openclaw.fnconsultorias.com.mx,*
+      - OPENCLAW_GATEWAY_CONTROLUI_ALLOWED_ORIGINS=https://openclaw.fnconsultorias.com.mx,wss://openclaw.fnconsultorias.com.mx,*
+      
+      # BYPASS TOTAL DE SEGURIDAD DE HOST
       - OPENCLAW_GATEWAY_CONTROL_UI_DANGEROUSLY_ALLOW_HOST_HEADER_ORIGIN_FALLBACK=true
+      - OPENCLAW_GATEWAY_CONTROLUI_DANGEROUSLYALLOWHOSTHEADERORIGINFALLBACK=true
       
     volumes:
-      # Saltamos al volumen v25 para forzar este reset total
-      - oclaw_config_v25:/home/node/.openclaw
+      # Nuevo volumen v30 para borrar cualquier rastro de error previo
+      - oclaw_config_v30:/home/node/.openclaw
     networks:
       - dokploy-network
 
 volumes:
   oclaw_ollama_data:
-  oclaw_config_v25:
+  oclaw_config_v30:
 
 networks:
   dokploy-network:
