@@ -1,7 +1,6 @@
 services:
   ollama:
     image: ollama/ollama:latest
-    container_name: oclaw-ai-engine
     restart: unless-stopped
     volumes:
       - oclaw_ollama_data:/root/.ollama
@@ -10,7 +9,6 @@ services:
 
   openclaw:
     image: ghcr.io/openclaw/openclaw:latest
-    container_name: oclaw-gateway
     depends_on:
       - ollama
     restart: unless-stopped
@@ -19,25 +17,30 @@ services:
       - OPENCLAW_DEFAULT_PROVIDER=ollama
       - OPENCLAW_DEFAULT_MODEL=gemma4:26b
       - OPENCLAW_OLLAMA_URL=http://ollama:11434
+      
+      # 1. CONFIGURACIÓN DE PROXY
       - OPENCLAW_GATEWAY_TRUST_PROXY=true
       - OPENCLAW_GATEWAY_PUBLIC_URL=https://openclaw.fnconsultorias.com.mx
       
-      # DESACTIVACIÓN TOTAL DE FILTROS DE ORIGEN
+      # 2. BYPASS DE SEGURIDAD (LLAVE MAESTRA 2026)
+      - OPENCLAW_GATEWAY_CONTROL_UI_UNSAFE_SKIP_ORIGIN_CHECK=true
+      - OPENCLAW_GATEWAY_CONTROLUI_UNSAFE_SKIP_ORIGIN_CHECK=true
       - OPENCLAW_GATEWAY_CONTROL_UI_ALLOWED_ORIGINS=*
       - OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS=*
-      - OPENCLAW_GATEWAY_CONTROL_UI_ALLOW_ALL_ORIGINS=true
-      - OPENCLAW_GATEWAY_CONTROLUI_ALLOWALLORIGINS=true
+      
+      # 3. FORZAR PROTOCOLO
       - OPENCLAW_GATEWAY_CONTROL_UI_DANGEROUSLY_ALLOW_HOST_HEADER_ORIGIN_FALLBACK=true
       
     volumes:
-      # Volumen v50 para forzar que tome estas nuevas variables
-      - oclaw_config_v50:/home/node/.openclaw
+      # Usamos el volumen v99 para GARANTIZAR que no lea configuraciones viejas
+      - oclaw_config_v99:/home/node/.openclaw
     networks:
       - dokploy-network
 
 volumes:
+  # Nombres sincronizados para evitar el error de "undefined volume"
   oclaw_ollama_data:
-  oclaw_config_v50:
+  oclaw_config_v99:
 
 networks:
   dokploy-network:
