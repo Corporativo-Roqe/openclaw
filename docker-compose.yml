@@ -1,6 +1,7 @@
 services:
   ollama:
     image: ollama/ollama:latest
+    container_name: oclaw-ai-engine
     restart: unless-stopped
     volumes:
       - oclaw_ollama_data:/root/.ollama
@@ -9,6 +10,7 @@ services:
 
   openclaw:
     image: ghcr.io/openclaw/openclaw:latest
+    container_name: oclaw-gateway
     depends_on:
       - ollama
     restart: unless-stopped
@@ -18,26 +20,27 @@ services:
       - OPENCLAW_DEFAULT_MODEL=gemma4:26b
       - OPENCLAW_OLLAMA_URL=http://ollama:11434
       
-      # CONFIGURACIÓN DE SEGURIDAD 2026 PARA PROXY
+      # CONFIGURACIÓN PARA DOKPLOY / TRAEFIK
       - OPENCLAW_GATEWAY_TRUST_PROXY=true
       - OPENCLAW_GATEWAY_PUBLIC_URL=https://openclaw.fnconsultorias.com.mx
       
-      # Nota la diferencia: CONTROL_UI (con guion bajo) y ALLOWED_ORIGINS
+      # SEGURIDAD: FORMATO 1 (CON GUIONES)
       - OPENCLAW_GATEWAY_CONTROL_UI_ALLOWED_ORIGINS=https://openclaw.fnconsultorias.com.mx,wss://openclaw.fnconsultorias.com.mx
-      
-      # El "Safe Mode" para forzar la entrada:
       - OPENCLAW_GATEWAY_CONTROL_UI_DANGEROUSLY_ALLOW_HOST_HEADER_ORIGIN_FALLBACK=true
       
+      # SEGURIDAD: FORMATO 2 (TODO JUNTO) POR COMPATIBILIDAD
+      - OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS=https://openclaw.fnconsultorias.com.mx,wss://openclaw.fnconsultorias.com.mx
+      - OPENCLAW_GATEWAY_CONTROLUI_DANGEROUSLYALLOWHOSTHEADERORIGINFALLBACK=true
+      
     volumes:
-      # CAMBIAMOS AL VOLUMEN V15: Para que el sistema se vea obligado a leer estas nuevas reglas
-      - oclaw_config_v15:/home/node/.openclaw
+      # Volumen v20 para asegurar inicio totalmente limpio
+      - oclaw_config_v20:/home/node/.openclaw
     networks:
       - dokploy-network
 
 volumes:
-  ollama_data:
-  # Nuevo volumen limpio
-  oclaw_config_v15:
+  oclaw_ollama_data:
+  oclaw_config_v20:
 
 networks:
   dokploy-network:
